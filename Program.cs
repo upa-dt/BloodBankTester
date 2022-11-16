@@ -1,9 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Newtonsoft.Json;
 using UPA_EXTERNAL_MODELS;
+using UPA_EXTERNAL_MODELS.Models.BloodBanks;
 using UPA_EXTERNAL_MODELS.Models.Configs;
 using UPA_SDK;
-using UPAExternalAPI.Models.BloodBanks;
 
 internal class Program
 {
