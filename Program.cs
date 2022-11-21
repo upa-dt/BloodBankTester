@@ -210,8 +210,4 @@ internal class Program
         ///  THANK YOU ///
     }
 
-    private static void Lookup_Tests(BloodBank _bloodBankObject)
-    {
-
-    }
 }
