@@ -163,7 +163,13 @@ internal class Program
             Console.WriteLine("No Deferrals For This Donor");
         else
             Console.WriteLine(findDonorResult.Result.deferral.SerializeObject());
+        Console.WriteLine("************* Donor Blood Information *************");
+        if (findDonorResult.Result.deferral == null || findDonorResult.Result.deferral.Count < 1)
+            Console.WriteLine("No Blood Information This Donor");
+        else
+            Console.WriteLine(findDonorResult.Result.bloodInfo.SerializeObject());
         Console.WriteLine("********************************************");
+
         // Register new Deferral For a donor
         DeferralModel newDeferralModel = new DeferralModel
         {
