@@ -112,6 +112,32 @@ internal class Program
         Console.WriteLine(newDonorResult.SerializeObject());
         Console.WriteLine("********************************************");
 
+
+
+
+        ///Register Donor Blood Information
+        var newDonorBLoodInformation = new RegisterDonorBloodInfoModel
+        {
+            donorCentralId = donorId,// This Donor ID Obtained After Regestring the Donor (_bloodBankObject.RegisterDonor), His Central ID is Returned
+            bloodGroup = 1,//[A Blood Group = 1] List of Blood Groups is obtained previously by calling _bloodBankObject.GetBloodGroups(); as explained
+            bloodRh = 1,//[+ive Rh = 1] List of Blood Rh is obtained previously by calling _bloodBankObject.GetBloodRh(); as explained
+
+        };
+        var newDonorBloodInfoResult = _bloodBankObject.RegisterDonorBloodInfo(newDonorBLoodInformation);
+
+        if (newDonorBloodInfoResult == null && newDonorBloodInfoResult.ErrorCode == 0)//Error Code != 0 Means There Is an Error
+        {
+            Console.WriteLine("Unable To Register Donor Blood Information");
+            Console.WriteLine($"Regestration Error : {newDonorResult.ErrorMessage}");
+            return;
+        }
+        int donorBloodInfoId = newDonorBloodInfoResult.Result;
+        Console.WriteLine("************* Donor Blood Information Added  *************");
+        Console.WriteLine($"  Donor Blood Info Added ID = {donorBloodInfoId}  /*Not Important Value, Just For Record*/");
+        Console.WriteLine("************* Register Donor Blood Information Result  ********");
+        Console.WriteLine(newDonorBloodInfoResult.SerializeObject());
+        Console.WriteLine("********************************************");
+
         // Now i Will Search For a donor to Know His Information using His National ID, and ID Type
         var searchDonorRequest = new DonorSearchModel
         {
