@@ -41,6 +41,12 @@ internal class Program
         Console.WriteLine("*************Blood Rh*************");
         Console.WriteLine(bloodRh.SerializeObject());
 
+
+        ///Get List of Blood Phenotype 
+        var PhenotypeList = _bloodBankObject.GetBloodPhenotype();
+        Console.WriteLine("*************Blood Phenotype*************");
+        Console.WriteLine(PhenotypeList.SerializeObject());
+
         ///Get List of Professions
         var professions = _bloodBankObject.GetProfessions();
         Console.WriteLine("************* Professions *************");
@@ -58,7 +64,7 @@ internal class Program
         Console.WriteLine("************* Defer Types *************");
         Console.WriteLine(deferTypes.SerializeObject());
 
-
+        /*
         ///Get List of Countries
         var countries = _bloodBankObject.GetCountries();
         Console.WriteLine("************* Countries *************");
@@ -73,7 +79,43 @@ internal class Program
         var districts = _bloodBankObject.GetDestricts();
         Console.WriteLine("************* Districts *************");
         Console.WriteLine(districts.SerializeObject());
-
+        */
+        ///Register a new Patient 
+        var newPatientData = new RegisterPatientModel
+        {
+            firstName = "Mohamed",
+            middleName = "Ibrahiem",
+            thirdName = "Mahmoud",
+            familyName = "Amer",
+            address = "Maadi Cairo",
+            birthDate = new DateTime(1980, 9, 1),
+            countryId = 85,//[Egypt Code = 85] List of Countries is obtained previously by calling _bloodBankObject.GetCountries(); as explained
+            cityId = 3223,//[Cairo Code = 3223] List of Cities is obtained previously by calling _bloodBankObject.GetCities(); as explained
+            districtId = 31802,//[Cairo District Code = 31802] List of Districts is obtained previously by calling _bloodBankObject.GetDestricts(); as explained
+                               // Country/City/District Codes should Match
+            bloodGroup = 1,//[A Blood Group = 1] List of Blood Groups is obtained previously by calling _bloodBankObject.GetBloodGroups(); as explained
+            bloodRh = 1,//[+ive Rh = 1] List of Blood Rh is obtained previously by calling _bloodBankObject.GetBloodRh(); as explained
+            profession = 2,//[Officer Profession = 2] List of Professions is obtained previously by calling _bloodBankObject.GetProfessions(); as explained
+            phone = "0100xxxxx38",//Donor Phone
+            gender = GenderEnum.Male,
+            idType = IDTypeEnum.NationalID,
+            donerId = "2800901xxxxxx2",// This is Either National ID or Passport Number Depends on [idType] Field provided before
+            comment = "This is A Test Patient",
+            transfusionDate = DateTime.Now
+        };
+        var newPatientResult = _bloodBankObject.RegisterPatient(newPatientData);
+        if (newPatientResult == null || newPatientResult.ErrorCode != 0)//Error Code != 0 Means There Is an Error
+        {
+            Console.WriteLine("Unable To Register New Patient");
+            Console.WriteLine($"Patient Regestration Error : {newPatientResult.ErrorMessage}");
+            return;
+        }
+        int PatientId = newPatientResult.Result;
+        Console.WriteLine("************* New Patient Added  *************");
+        Console.WriteLine($"  New Patient Added ID = {PatientId}");
+        Console.WriteLine("************* Register Patient Result  ********");
+        Console.WriteLine(newPatientResult.SerializeObject());
+        Console.WriteLine("********************************************");
 
         ///Register a new Donor
         var newDonorData = new RegisterDonorModel
@@ -99,7 +141,7 @@ internal class Program
         };
         var newDonorResult = _bloodBankObject.RegisterDonor(newDonorData);
 
-        if (newDonorResult == null && newDonorResult.ErrorCode == 0)//Error Code != 0 Means There Is an Error
+        if (newDonorResult == null || newDonorResult.ErrorCode != 0)//Error Code != 0 Means There Is an Error
         {
             Console.WriteLine("Unable To Register New Donor");
             Console.WriteLine($"Regestration Error : {newDonorResult.ErrorMessage}");
@@ -112,20 +154,17 @@ internal class Program
         Console.WriteLine(newDonorResult.SerializeObject());
         Console.WriteLine("********************************************");
 
-
-
-
         ///Register Donor Blood Information
         var newDonorBLoodInformation = new RegisterDonorBloodInfoModel
         {
             donorCentralId = donorId,// This Donor ID Obtained After Regestring the Donor (_bloodBankObject.RegisterDonor), His Central ID is Returned
             bloodGroup = 1,//[A Blood Group = 1] List of Blood Groups is obtained previously by calling _bloodBankObject.GetBloodGroups(); as explained
             bloodRh = 1,//[+ive Rh = 1] List of Blood Rh is obtained previously by calling _bloodBankObject.GetBloodRh(); as explained
-
+            bloodPhenotype = new List<int> { 1, 2, 3 }// Phenotype List could be obtained by calling _bloodBankObject.GetBloodPhenotype
         };
         var newDonorBloodInfoResult = _bloodBankObject.RegisterDonorBloodInfo(newDonorBLoodInformation);
 
-        if (newDonorBloodInfoResult == null && newDonorBloodInfoResult.ErrorCode == 0)//Error Code != 0 Means There Is an Error
+        if (newDonorBloodInfoResult == null || newDonorBloodInfoResult.ErrorCode != 0)//Error Code != 0 Means There Is an Error
         {
             Console.WriteLine("Unable To Register Donor Blood Information");
             Console.WriteLine($"Regestration Error : {newDonorResult.ErrorMessage}");
@@ -164,11 +203,15 @@ internal class Program
         else
             Console.WriteLine(findDonorResult.Result.deferral.SerializeObject());
         Console.WriteLine("************* Donor Blood Information *************");
-        if (findDonorResult.Result.deferral == null || findDonorResult.Result.deferral.Count < 1)
+        if (findDonorResult.Result.info == null || findDonorResult.Result.info.Count < 1)
             Console.WriteLine("No Blood Information This Donor");
         else
             Console.WriteLine(findDonorResult.Result.bloodInfo.SerializeObject());
-        Console.WriteLine("********************************************");
+        Console.WriteLine("*************Donor Transfusion History Information*******************");
+        if (findDonorResult.Result.transfusionHistory == null || findDonorResult.Result.transfusionHistory.Count < 1)
+            Console.WriteLine("No Transfusion History For This Donor");
+        else
+            Console.WriteLine(findDonorResult.Result.transfusionHistory.SerializeObject());
 
         // Register new Deferral For a donor
         DeferralModel newDeferralModel = new DeferralModel
